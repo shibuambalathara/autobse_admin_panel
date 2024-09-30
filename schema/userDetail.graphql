@@ -1,0 +1,21 @@
+query viewUser($where: UserWhereUniqueInput!) {
+  user(where: $where) {
+    id
+    email
+    username
+    role
+    firstName
+    lastName
+    businessName
+    mobile
+    BalanceEMDAmount
+    pancardNo
+    idProofNo
+    country
+    city
+    userCategory
+    status
+    state
+    tempToken
+  }
+}

@@ -1,0 +1,33 @@
+query Payment($where: PaymentWhereUniqueInput!) {
+  payment(where: $where) {
+    id
+    refNo
+    amount
+    description
+    status
+    userId
+    image
+    createdAt
+    updatedAt
+    createdById
+    registrationExpire
+    paymentFor
+  }
+}
+
+mutation UpdatePayment($where: PaymentWhereUniqueInput!, $updatePaymentInput: UpdatePaymentInput!) {
+  updatePayment(where: $where, updatePaymentInput: $updatePaymentInput) {
+    id
+    refNo
+    amount
+    description
+    status
+    userId
+    image
+    createdAt
+    updatedAt
+    createdById
+    registrationExpire
+    paymentFor
+  }
+}
