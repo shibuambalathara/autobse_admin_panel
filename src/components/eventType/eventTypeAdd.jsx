@@ -1,87 +1,96 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useCreateEventTypeMutation, useCreateStateMutation } from "../../utils/graphql";
-
+import { useCreateVehiclecategoryMutation } from "../../utils/graphql";
 import Swal from "sweetalert2";
 
 const AddEventType = () => {
-  const [createState] = useCreateEventTypeMutation();
-  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [createState] = useCreateVehiclecategoryMutation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
 
   const onSubmit = async (dataOnSubmit) => {
+    try {
+      await createState({
+        variables: { 
+          createVehiclecategoryInput: {  // Update the variable name here
+            name: dataOnSubmit?.name,
+          },
+        },
+      });
 
-   createState({
-      variables: { data: { name: dataOnSubmit?.name } },
-    }).then(()=>{
       Swal.fire({
         title: "Success!",
-        text: `${dataOnSubmit?.name} Added successfully!`,
+        text: `${dataOnSubmit?.name} added successfully!`,
         icon: "success",
         timer: 3000,
         showConfirmButton: true,
-        
       });
+
       setIsModalOpen(false);
-    }).catch((err)=>{
+    } catch (err) {
       Swal.fire({
-        title:err,
-        icon:'error'
-      })
-    })
-
- 
-
-    
+        title: "Error",
+        text: err.message,
+        icon: "error",
+      });
+    }
   };
-  return (
-    <div className="w-full max-w-xs     relative ml-50 ">
-      <div className="absolute top-3 left-10 ">
-        <label htmlFor="my-modal-3" className="btn  btn-outline btn-secondary">
-          Add Event Types
-        </label>
-      </div>
 
-      <input
-        type="checkbox"
-        id="my-modal-3"
-        className="modal-toggle"
-        checked={isModalOpen}
-        onChange={() => setIsModalOpen(!isModalOpen)}
-      />
-      <div className="modal ">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="modal-box relative w-96">
-            <label
-              htmlFor="modal-toggle"
-              className="btn btn-sm btn-circle absolute right-2 top-2"
-              onClick={() => setIsModalOpen(false)} // add click handler to close modal
+  return (
+    <div className="w-full max-w-xs relative">
+      {/* Button to trigger modal */}
+      <button 
+        className="btn btn-outline btn-secondary" 
+        onClick={() => setIsModalOpen(true)}
+      >
+        Add Event Types
+      </button>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className=" bg-blue-50  w-96  shadow-lg h-36 ">
+            {/* Close button */}
+            <button 
+              className=" btn-circle absolute right-4 top-4"
+              onClick={() => setIsModalOpen(false)}
             >
               ✕
-            </label>
+            </button>
 
-            <div className="flex flex-col">
-              <label>Events Type Name</label>
-              <input
-                {...register("name", { required: true })}
-                className="input input-bordered input-secondary  "
-                type="text"
-              />
-            </div>
-            {errors.name && <span>This field is required</span>}
-            <div className=" flex justify-center space-x-5 my-5">
-              <button type="submit" className="btn btn-outline btn-secondary">
-                Add Event Type
-              </button>
-            </div>
+            {/* Modal content */}
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="flex flex-col space-y-4 rounded-lg ">
+                <label className="text-lg font-semibold text-center text-white  bg-blue-400 ">Event Type Name</label>
+                <input
+                  {...register("name", { required: true })}
+                  className="input input-bordered bg-white text-gray-900 rounded-md h-10 px-5 mx-6"
+                  type="text"
+                  placeholder="Enter event type"
+                />
+                {errors.name && (
+                  <span className="text-red-400">This field is required</span>
+                )}
+
+                {/* Submit button */}
+                <div className="flex justify-center mt-4">
+                  <button
+                    type="submit"
+                    className="btn btn-secondary bg-white px-3 py-1 hover:bg-gray-100"
+                  >
+                    Add Event Type
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -5,8 +5,8 @@ import Select from "react-select";
 import { ShowPopup } from "../alerts/popUps";
 
 import {
-  useSellersItemQuery,
-  useEventTypesQuery,
+  useSellersQuery,
+useVehicleCategoriesQuery,
   useLocationsQuery,
   useCreateEventMutation,
 } from "../../utils/graphql";
@@ -16,11 +16,13 @@ import { formStyle, headerStyle, inputStyle, labelAndInputDiv, pageStyle } from 
 
 const AddEventComponent = () => {
   const navigate = useNavigate();
-  const sellersItem = useSellersItemQuery();
-  const eventType = useEventTypesQuery();
+  const sellersItem = useSellersQuery();
+  const eventType = useVehicleCategoriesQuery();
+  console.log(eventType);
+  
   const location = useLocationsQuery();
-  const [addEvent, { data }] = useCreateEventMutation();
-  const [category, setCategory] = useState("online");
+  const [addEvent, { data }] =  useCreateEventMutation();
+  const [category, setCategory] = useState("Online");
 
   const {
     register,
@@ -31,56 +33,71 @@ const AddEventComponent = () => {
   } = useForm();
 
   const onSubmit = (dataOnSubmit) => {
-   
-
-    const isoDateTime = new Date(dataOnSubmit?.startDate).toISOString();
-    const endDateTime = new Date(dataOnSubmit?.endDate).toISOString();
-    const bids = +dataOnSubmit?.noOfBids;
-    const extraTimeTriger = +dataOnSubmit?.timeTriger;
+    // Convert the start and end date to ISO format
+    const isoStartDate = new Date(dataOnSubmit?.startDate).toISOString();
+    const isoEndDate = new Date(dataOnSubmit?.endDate).toISOString();
+  
+    // Convert certain form values to numbers as needed
+    const noOfBids = +dataOnSubmit?.noOfBids;
+    const extraTimeTrigger = +dataOnSubmit?.timeTriger;
     const extraTime = +dataOnSubmit?.extraTime;
     const gap = +dataOnSubmit?.gap;
-    const live = +dataOnSubmit?.liveTime;
-
-    const eventData = {
-      // eventCategory:dataOnSubmit?.eventCategory,
-      eventCategory: category,
-      startDate: isoDateTime,
-      endDate: endDateTime,
-      noOfBids: bids,
-      seller: { connect: { id: dataOnSubmit?.sellerName || "" } },
-
-      eventType: {
-        connect: dataOnSubmit?.eventId?.map((event) => ({ id: event.value })),
-      },
-      location: { connect: { id: dataOnSubmit?.location || "" } },
+    const liveTime = +dataOnSubmit?.liveTime;
+  
+    // Prepare the createEventInput object
+    const createEventInput = {
+      eventCategory: category, // "online" or "open" selected via state
+      startDate: isoStartDate,
+      endDate: isoEndDate,
+      noOfBids: noOfBids,
       status: dataOnSubmit?.status,
-
       termsAndConditions: dataOnSubmit?.conditions,
       bidLock: dataOnSubmit?.lockedOrNot,
       isSpecialEvent: dataOnSubmit?.special,
-      extraTimeTrigerIn: extraTimeTriger,
+      extraTimeTrigerIn: extraTimeTrigger,
       extraTime: extraTime,
-      vehicleLiveTimeIn: live,
+      vehicleLiveTimeIn: liveTime,
       gapInBetweenVehicles: gap,
+      // eventType: {
+      //   connect: dataOnSubmit?.eventId?.map((event) => ({ id: event.value})),
+      // },
+     
     };
-    if (dataOnSubmit.downloadable[0] && dataOnSubmit.downloadable.length) {
-      eventData["downloadableFile"] = { upload: dataOnSubmit.downloadable[0] };
-    }
-    addEvent({ variables: { data: eventData } })
+  
+    // Include the downloadable file if present
+    // if (dataOnSubmit.downloadable?.length) {
+    //   createEventInput["downloadableFile"] = { upload: dataOnSubmit.downloadable[0] };
+    // }
+  
+    // Prepare the variables for the mutation
+    const variables = {
+      vehicleCategoryId: dataOnSubmit?.eventId || "", // Assuming it's part of form data
+      locationId: dataOnSubmit?.location || "", // Assuming it's part of form data
+      createEventInput: createEventInput,
+      sellerId: dataOnSubmit?.sellerName || "",
+    };
+  
+    // Make the API call using the create event mutation
+    addEvent({ variables })
       .then((result) => {
-      
+        // Show success popup if the event is created successfully
         ShowPopup(
           "Success!",
-          `Event Created Successfully! Upload Excel Now`,
+          "Event Created Successfully! Upload Excel Now",
           "success",
           5000,
           true
         );
+        
+        // Navigate to excel upload page
+        navigate(`/excel-upload/${result?.data?.createEvent?.id}`);
       })
       .catch((error) => {
-        ShowPopup("Failed!", `${error.message} `, "error", 5000, true);
+        // Show error popup in case of any issues
+        ShowPopup("Failed!", error.message, "error", 5000, true);
       });
   };
+  
 
   const handleOnClick = () => {
     
@@ -111,8 +128,8 @@ const AddEventComponent = () => {
                 //  {...register("eventCategory",{required:true})}
                 className={`${inputStyle.data}`}
               >
-                <option value="online">Online Auction </option>
-                <option value="open">Open Auction</option>
+                <option value="Online">Online Auction </option>
+                <option value="Open">Open Auction</option>
               </select>
               <p className="text-red-500">
                 {" "}
@@ -181,6 +198,28 @@ const AddEventComponent = () => {
             </div>
             <div className={`${labelAndInputDiv.data}`}>
               <label className="font-bold" htmlFor="">
+              Event Type
+              </label>
+
+              <select
+                placeholder="select"
+                {...register("eventId", { required: true })}
+                className={`${inputStyle.data}`}
+              >
+                <option value="">Select</option>
+                {eventType?.data?.vehicleCategories?.map((event) => (
+                  <option key={event.name} value={event.id}>
+                    {event.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-red-500">
+                {" "}
+                {errors.sellerName && <span>vehicleCategorie Name required</span>}
+              </p>
+            </div>
+            {/* <div className={`${labelAndInputDiv.data}`}>
+              <label className="font-bold" htmlFor="">
                 Event Type
               </label>
 
@@ -190,7 +229,7 @@ const AddEventComponent = () => {
                 render={({ field }) => (
                   <Select
                     className={`${inputStyle.data}`}
-                    options={eventType?.data?.eventTypes?.map((event) => ({
+                    options={eventType?.data?.vehicleCategories?.map((event) => ({
                       label: event.name,
                       value: event.id,
                     }))}
@@ -205,7 +244,7 @@ const AddEventComponent = () => {
                 {" "}
                 {errors.event && <span>Event Name required</span>}
               </p>
-            </div>
+            </div> */}
             <div className={`${labelAndInputDiv.data}`}>
               <label className="font-bold" htmlFor="">
                 Location
@@ -257,11 +296,18 @@ const AddEventComponent = () => {
                 {...register("status", {})}
                 className={`${inputStyle.data}`}
               >
-                <option value="active">active</option>
-                <option value="pending">pending </option>
-                <option value="blocked">blocked</option>
-                <option value="inactive">inactive</option>
-                <option value="stop">stop</option>
+                
+
+
+
+
+
+                <option value="Active">Active</option>
+                <option value="Pending">Pending </option>
+                <option value="Blocked">Blocked</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Stop">Stop</option>
+                Pause
               </select>
             </div>
 
@@ -290,8 +336,8 @@ const AddEventComponent = () => {
                   className={`${inputStyle.data}`}
                 >
                   {/* <option value="" selected placeholder="select">select </option> */}
-                  <option value="locked">locked </option>
-                  <option value="unlocked">unlocked</option>
+                  <option value="Locked">Locked </option>
+                  <option value="Unlocked">Unlocked</option>
                 </select>
               </div>
             )}

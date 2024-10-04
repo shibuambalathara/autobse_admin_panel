@@ -108,7 +108,7 @@ const PaymentTable = ({data}) => {
         Cell: ({ row }) => (
           <a
             className="btn bg-rose-500  text-xl"
-            href={`/payment/${row.original?.id}`}
+            href={`/payment/${row.original?.userId}`}
             target="_blank"
             rel="noopener noreferrer"
           >

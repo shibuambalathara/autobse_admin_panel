@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo,useState } from 'react'
 import {useNavigate} from 'react-router-dom'
-import {useDeleteEventMutation, useEventTableQuery, useUpdateEventMutation} from '../../utils/graphql'
+import { useEventsQuery, useUpdateEventMutation} from '../../utils/graphql'
 import Report from './report'
 import Swal from "sweetalert2";
 import TableComponent from '../utils/table'
@@ -17,7 +17,11 @@ const EventsTableComponent = () => {
   const [pageSize, setPageSize] = useState(10);
 
 
-    const {data,loading,error,refetch}=useEventTableQuery({variables:{ skip: currentPage * pageSize,take:pageSize, orderBy: {startDate:"desc"}}})
+    const {data,loading,error,refetch}=useEventsQuery({variables:
+      { 
+        // skip: currentPage * pageSize,take:pageSize, orderBy: {startDate:"desc"}
+        }})
+console.log(data,"data");
 
 const [addParticipants]=useUpdateEventMutation()
 
@@ -28,7 +32,7 @@ useEffect(()=>{
 },[data])
 
     const navigate=useNavigate()
-   const [deleteEvent]=useDeleteEventMutation()
+  //  const [deleteEvent]=useDeleteEventMutation()
 
 
 
@@ -72,8 +76,8 @@ const { value: input } = await Swal.fire({
 })
 }
 const handleDelete=(id)=>{
-  deleteEvent({variables:{where:{id}}})
-  refetch()
+  // deleteEvent({variables:{where:{id}}})
+  // refetch()
 }
    
 
@@ -219,7 +223,7 @@ const handleDelete=(id)=>{
   
    </div>
      
-       <TableComponent tableData={data?.events} columns={columns} sortBy='start Date'/>
+       <TableComponent data={data?.events} columns={columns} sortBy='start Date'/>
   
           <LimitedDataPaginationComponents   
           currentPage={currentPage}

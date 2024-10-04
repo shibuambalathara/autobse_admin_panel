@@ -5,7 +5,7 @@ import { Button } from '@material-tailwind/react'
 import React, { useEffect, useMemo } from 'react'
 import {useNavigate} from 'react-router-dom'
 import { useTable,usePagination,useGlobalFilter,useSortBy } from "react-table"
-import {useDeleteEventTypeMutation, useEventTypesQuery} from '../../utils/graphql'
+import { useVehicleCategoriesQuery} from '../../utils/graphql'
 import SearchUser from '../utils/search'
 
 import TableComponent from '../utils/table'
@@ -17,12 +17,13 @@ import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 
 
 const EventTypesTable = () => {
-    const {data,loading,error,refetch}=useEventTypesQuery()
-    const [deleteEventType]=useDeleteEventTypeMutation()
+    const {data,loading,error,refetch}=useVehicleCategoriesQuery()
+    // const [deleteEventType]=useDeleteEventTypeMutation()
     const navigate=useNavigate()
+console.log(data ,"c ategory");
 
     const handleDelete=(id)=>{
- const result=deleteEventType({variables:{where:{id}}})
+//  const result=deleteEventType({variables:{where:{id}}})
     }
 
     const columns = useMemo(
@@ -57,7 +58,7 @@ const EventTypesTable = () => {
 
       useEffect(()=>{
 refetch()
-      },[])
+      },[data?.vehicleCategories])
     
       if (loading) return <p>Loading...</p>;
       
@@ -73,7 +74,8 @@ refetch()
       </div>
       <div className="text-center font-extrabold my-5 text-lg min-w-full">  Events type Table </div>
 
-  <TableComponent tableData={data?.eventTypes} columns={columns}/>
+  <TableComponent data={data?.vehicleCategories
+} columns={columns}/>
       
      
         

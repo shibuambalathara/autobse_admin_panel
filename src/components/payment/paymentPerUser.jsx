@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {usePaymentQuery} from '../../utils/graphql'
+import {useUserPaymentsQuery} from '../../utils/graphql'
 import format from 'date-fns/format'
 import Swal from "sweetalert2";
 import jsPDF from 'jspdf';
@@ -10,7 +10,7 @@ import { FormatDate } from '../utils/dateFormat';
 
 const PaymentPerUser = () => {
     const {id}=useParams()
-    const {data,loading}=usePaymentQuery({variables:{where:{id:id}}})
+    const {data,loading}=useUserPaymentsQuery({variables:{where:{id:id}}})
     
     console.log(data, "payment dta");
     
@@ -73,35 +73,35 @@ navigate(`/update-payment/${paymentId}`)
      row.original.emdUpdateCount!==0 &&         <a className="btn bg-zinc-500" href={`/emdDetails/${row.original.id}`} target="_blank" rel="noopener noreferrer">Emd Details </a>
             )
           },
-          {
-            Header: "Create Buying Limit",
-            Cell: ({ row }) => {
-              if (
-                row.original.emdUpdateCount === 0 &&
-                row.original.paymentFor === 'emd' &&
-                row.original.status === 'success'
-              ) {
-                return (
-                  <a
-                    className="btn btn-secondary"
-                    href={`/add-emd/${row.original.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Increase Buying Limit
-                  </a>
-                );
-              }
-               else {
-                return(
-                  <>
-                  Increment by:{ row.original.emdUpdate[0]?.vehicleBuyingLimitIncrement ??'0'},
-                  <br /> Status: {row.original.status}
-                  </>
-                  );
-              }
-            }
-          },
+          // {
+          //   Header: "Create Buying Limit",
+          //   Cell: ({ row }) => {
+          //     if (
+          //       row.original.emdUpdateCount === 0 &&
+          //       row.original.paymentFor === 'emd' &&
+          //       row.original.status === 'success'
+          //     ) {
+          //       return (
+          //         <a
+          //           className="btn btn-secondary"
+          //           href={`/add-emd/${row.original.id}`}
+          //           target="_blank"
+          //           rel="noopener noreferrer"
+          //         >
+          //           Increase Buying Limit
+          //         </a>
+          //       );
+          //     }
+          //      else {
+          //       return(
+          //         <>
+          //         Increment by:{ row.original.emdUpdate[0]?.vehicleBuyingLimitIncrement ??'0'},
+          //         <br /> Status: {row.original.status}
+          //         </>
+          //         );
+          //     }
+          //   }
+          // },
           {
             Header: "Payment Message",
             Cell: ({ row }) => {
@@ -149,7 +149,7 @@ navigate(`/update-payment/${paymentId}`)
 
   </div>
   
-          <TableComponent data={data.payment} columns={columns} sortBy='Created At'/>
+          <TableComponent data={data?.user?.payments} columns={columns} sortBy='Created At'/>
 
   
   </div>

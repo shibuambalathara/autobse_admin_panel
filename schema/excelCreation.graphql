@@ -1,0 +1,14 @@
+mutation CreateExcelupload($userId: String!, $eventId: String!, $createExceluploadInput: CreateExceluploadInput!) {
+  createExcelupload(userId: $userId, eventId: $eventId, createExceluploadInput: $createExceluploadInput) {
+    id
+    name
+    file_filename
+    createdAt
+    updatedAt
+    createdById
+  }
+}
+
+
+
+

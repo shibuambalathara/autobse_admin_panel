@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useEventsReportQuery } from "../../utils/graphql";
+// import { useEventsReportQuery } from "../../utils/graphql";
 import { useForm } from "react-hook-form";
 import format from "date-fns/format";
 import { ConvertToExcel } from "../utils/excelFormat";
@@ -9,19 +9,19 @@ const Report = () => {
   const [isoDateTimeTo, setIsoDateTimeTo] = useState(0);
 
 
-  const { data, loading } = useEventsReportQuery({
-    variables: {
-      where: {
-        startDate: {
-          gt: isoDateTimeFrom,
-          lt: isoDateTimeTo,
-        },
-      },
-    },
-  });
+  // const { data, loading } = useEventsReportQuery({
+  //   variables: {
+  //     where: {
+  //       startDate: {
+  //         gt: isoDateTimeFrom,
+  //         lt: isoDateTimeTo,
+  //       },
+  //     },
+  //   },
+  // });
 
 
- 
+ const data = ''
   const {
     register,
     handleSubmit,
@@ -55,7 +55,7 @@ const Report = () => {
      ConvertToExcel(result);
   };
 
-  if (loading) return <p>Loading...</p>;
+  // if (loading) return <p>Loading...</p>;
   return (
     <div className="flex flex-col  justify-center w-full  ">
       <form onSubmit={handleSubmit(onSubmit)}>

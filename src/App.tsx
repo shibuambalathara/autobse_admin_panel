@@ -17,6 +17,13 @@ import AddPaymentForUser from './pages/addPayment';
 import AddPaymentDetails from './pages/addPaymentDetails';
 import PaymentUserDetails from './pages/paymentUserDetails';
 import Payments from './pages/payments';
+import AddEventType from './pages/addEventType';
+import EditEvent from './pages/editEvent';
+
+import EventTypes from './pages/eventTypes';
+import AddEvents from './pages/events';
+import AddEventForm from './pages/addEventForm';
+import AddExcel from './pages/addExcel';
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -25,7 +32,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      {!isProjectorView && <Header />}
+      {!isProjectorView  && !isLoginPage &&  <Header />}
       <div className="flex w-full">
         {!isProjectorView && !isLoginPage && <Sidebar />}
        
@@ -46,7 +53,15 @@ const App: React.FC = () => {
               <Route path="payment" element={<Payments />} />
               <Route path="create-payment/:id" element={<AddPaymentForUser />} />
               <Route path="update-payment/:id" element={<AddPaymentDetails />}/>
-              {/* <Route path="payment/:id" element={<PaymentUserDetails />} /> */}
+              <Route path="payment/:id" element={<PaymentUserDetails />} />
+              <Route path="addevent" element={<AddEventForm />} />
+              {/* <Route path="addeventtype" element={<AddEventType />} />
+              <Route path="edit-event/:id" element={<EditEvent />} /> */}
+               <Route path="event-types" element={<EventTypes />} />
+
+
+               <Route path="events" element={<AddEvents />} />
+               <Route path="excel-upload/:id" element={<AddExcel />} />
               </Route>
               </Routes>
           {/* Your routes and other components go here */}

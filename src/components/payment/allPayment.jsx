@@ -34,10 +34,10 @@ useEffect(() => {
     <div className="bg-gray-100">
       
      <PaymentTable data={data?.payments}/>
-       {/* <LimitedDataPaginationComponents
+       <LimitedDataPaginationComponents
       currentPage={currentPage}
       onPageChange={handlePageChange}
-    />  */}
+    /> 
     </div>
   );
 };
